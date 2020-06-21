@@ -29,8 +29,14 @@ namespace ReferenceForEach
         public ReferenceList(List<TValue> List)
         {
             FieldInfo Field = List.GetType().GetField("_items", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField);
-            Length = List.Count;
             Items = Field.GetValue(List) as TValue[];
+            Length = List.Count;
+        }
+
+        public ReferenceList(TValue[] List)
+        {
+            Items = List;
+            Length = List.Length;
         }
 
         public readonly ref TValue this[int Index] => ref Items[Index];
@@ -181,6 +187,9 @@ namespace ReferenceForEach
 
     public static class CollectionExtensions
     {
+        public static ReferenceList<T> ToReference<T>(this T[] Source)
+            => new ReferenceList<T>(Source);
+
         public static ReferenceList<T> ToReference<T>(this List<T> Source)
             => new ReferenceList<T>(Source);
 
@@ -262,11 +271,26 @@ namespace ReferenceForEach
             }
         }
 
+        private static void TestReferenceArrayInForEach()
+        {
+            int[] Values = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+            foreach (ref int Value in Values.ToReference())
+                Value *= Values.Length * Value;
+
+            int Index = 0;
+            foreach (ref readonly int Value in Values.ToReference())
+                WriteLine($"{++Index}: {Value}");
+
+            WriteLine();
+        }
+
         public static void Main(string[] _)
         {
             // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/struct
             // http://benbowen.blog/post/fun_with_makeref/
 
+            TestReferenceArrayInForEach();
             TestReferenceListInForEach();
             TestReferenceDictionaryInForEach();
 
