@@ -5,8 +5,10 @@ using System.Runtime.CompilerServices;
 
 using static System.Console;
 
-namespace ForeachRefReadonly
+namespace ReferenceForEach
 {
+#pragma warning disable CS0169, CS0649
+
     public unsafe struct ReferenceWrapper<TValue>
     {
         private readonly void* Pointer;
@@ -185,6 +187,8 @@ namespace ForeachRefReadonly
         public static ReferenceDictionary<TKey, TValue> ToReference<TKey, TValue>(this Dictionary<TKey, TValue> Source)
             => new ReferenceDictionary<TKey, TValue>(Source);
     }
+
+#pragma warning restore  CS0169, CS0649
 
     public class Program
     {
